@@ -1,5 +1,5 @@
 from circleshape import *
-from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED
+from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT
 from circleshape import CircleShape
 import pygame
 
@@ -17,20 +17,28 @@ class Player(CircleShape):
 
     def move(self, dt, direction=1):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        self.position += forward * PLAYER_SPEED * dt * direction
+        new_position = self.position + forward * PLAYER_SPEED * dt * direction
+
+        screen_rect = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+        if screen_rect.collidepoint(new_position.x, new_position.y):
+            self.position = new_position
 
 
     def update(self, dt):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_a]:
-            self.rotate(dt, -1)
-        if keys[pygame.K_d]:
-            self.rotate(dt, 1)
-        if keys[pygame.K_w]:
-            self.move(dt, 1)
-        if keys[pygame.K_s]:
-            self.move(dt, -1)
+        rotation_input = 0
+        movement_input = 0
+
+        if keys[pygame.K_a]: rotation_input -= 1
+        if keys[pygame.K_d]: rotation_input += 1
+        if keys[pygame.K_w]: movement_input += 1
+        if keys[pygame.K_s]: movement_input -= 1
+
+        if rotation_input != 0:
+            self.rotate(dt, rotation_input)
+        if movement_input != 0:
+            self.move(dt, movement_input)
 
 
     def triangle(self):
