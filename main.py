@@ -42,7 +42,7 @@ def main():
 
         for asteroid in asteroids:
             if player.collides_with(asteroid):
-                print("Game Over")
+                print("Game Over!")
                 pygame.quit()
                 sys.exit()
                 return
