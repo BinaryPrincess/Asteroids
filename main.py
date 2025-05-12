@@ -5,6 +5,7 @@ from Asteroid import Asteroid
 import time
 from asteroidfield import AsteroidField
 import sys
+from shot import Shot
 
 def main():
     pygame.init()
@@ -13,14 +14,17 @@ def main():
     dt = 0
     frame_count = 0
     start_time = time.time()
+    graveyard = set()
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
 
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
+    Shot.containers = (shots, updatable, drawable)
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
@@ -31,7 +35,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
 
         screen.fill("black")
         updatable.update(dt)
@@ -46,6 +52,18 @@ def main():
                 pygame.quit()
                 sys.exit()
                 return
+
+        for shot in shots:
+            if getattr(shot, "should_delete", False):
+                graveyard.add(shot)
+
+        for asteroid in asteroids:
+            if getattr(asteroid, "should_delete", False):
+                graveyard.add(asteroid)
+
+        for sprite in graveyard:
+            sprite.kill()
+        graveyard.clear()
 
         frame_count += 1
         if time.time() - start_time > 1:
