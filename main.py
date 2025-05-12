@@ -52,6 +52,11 @@ def main():
                 pygame.quit()
                 sys.exit()
                 return
+            for shot in shots:
+                if shot.collides_with(asteroid):
+                    asteroid.should_delete = True
+                    shot.should_delete = True
+                    break
 
         for shot in shots:
             if getattr(shot, "should_delete", False):
